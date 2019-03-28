@@ -27,10 +27,10 @@ class MyTcpHandler(socketserver.BaseRequestHandler):
 
         try:
             username = self.registerUsername()
-            # msg = self.request.recv(1024)
-            # while msg:
-            #     print(msg.decode())
-            #     msg = self.request.recv(1024)
+            msg = self.request.recv(1024)
+            while msg:
+                print(msg.decode())
+                msg = self.request.recv(1024)
 
         except Exception as e:
             print(e)
