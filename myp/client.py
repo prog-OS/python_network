@@ -13,10 +13,14 @@ clientSocket = socket(AF_INET, SOCK_STREAM)
 
 try:
     clientSocket.connect(ADDR)
-    clientSocket.send('Hello!'.encode())
-
 except Exception as e:
     print('%s:%s' % ADDR)
     sys.exit()
 
-print('connect is success')
+
+
+data = clientSocket.recv(BUFSIZE)
+print('%s\n' % data.decode())
+data = clientSocket.recv(BUFSIZE)
+print('%s\n' % data.decode())
+
