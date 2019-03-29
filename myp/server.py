@@ -19,18 +19,24 @@ class UserManger:
 
         # for key, value in self.users.items():
         #     print(key, ":", value)
-        self.sendMessageToAll('[%s]님이 입장했습니다.' % username)
+        self.sendMessageToAll(username, '\n[%s]님이 입장했습니다.' % username)
         print('+++ 대화 참여자 수[%d]' % len(self.users))
         return username
 
     def messageHandler(self, username, msg):
         if msg[0] != '/':
-            self.sendMessageToAll('[%s] %s' % (username, msg))
+            self.sendMessageToAll(username, '\n[%s] %s' % (username, msg))
             return
 
-    def sendMessageToAll(self, msg):
+    def sendMessageToAll(self, username, msg):
         for conn, addr in self.users.values():
-            conn.send(msg.encode())
+            # print(self.users[username][0])
+            # print(conn)
+            print('111111111111111')
+            if self.users[username][0] != conn: # 중복 메시지 방지
+                print('if if if if if')
+                conn.send(msg.encode())
+            print('222222222222222')
 
 class MyTcpHandler(socketserver.BaseRequestHandler):
     usermanager = UserManger()
@@ -41,8 +47,11 @@ class MyTcpHandler(socketserver.BaseRequestHandler):
         try:
             username = self.registerUsername()
             # msg = self.request.recv(1024)
+            # print('zzz')
             while True:
+                # self.request.send(('[%s] ' % username).encode())
                 msg = self.request.recv(1024) # b'test' / type = byte
+                # print('xxx')
                 self.usermanager.messageHandler(username, msg.decode())
                 print('[%s] %s' % (username, msg.decode())) # type = str
 
@@ -52,8 +61,10 @@ class MyTcpHandler(socketserver.BaseRequestHandler):
     def registerUsername(self):
         while True:
             self.request.send('로그인 ID : '.encode())
+            print('로그인 ID 기다리는 중...')
             username = self.request.recv(1024) # b'username'
             username = username.decode().strip() # strip() 얄옆 공백, \n 제거
+            print('받음')
             # print('-----\n', username, '\n------\n')
             if self.usermanager.addUser(username, self.request, self.client_address):
                 return username
