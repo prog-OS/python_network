@@ -12,12 +12,25 @@ class UserManger:
         # if username in self.users:
         #     conn.send('이미 등록된 사용자 입니다.\n'.encode())
         #     return None
+        
         lock.acquire()
-        self.users[username] = (conn, addr)
+        self.users[username] = (conn, addr) # key=username / values=conn, addr
         lock.release()
 
+        # for key, value in self.users.items():
+        #     print(key, ":", value)
+        self.sendMessageToAll('[%s]님이 입장했습니다.' % username)
         print('+++ 대화 참여자 수[%d]' % len(self.users))
         return username
+
+    def messageHandler(self, username, msg):
+        if msg[0] != '/':
+            self.sendMessageToAll('[%s] %s' % (username, msg))
+            return
+
+    def sendMessageToAll(self, msg):
+        for conn, addr in self.users.values():
+            conn.send(msg.encode())
 
 class MyTcpHandler(socketserver.BaseRequestHandler):
     usermanager = UserManger()
@@ -27,10 +40,11 @@ class MyTcpHandler(socketserver.BaseRequestHandler):
 
         try:
             username = self.registerUsername()
-            msg = self.request.recv(1024)
-            while msg:
-                print(msg.decode())
-                msg = self.request.recv(1024)
+            # msg = self.request.recv(1024)
+            while True:
+                msg = self.request.recv(1024) # b'test' / type = byte
+                self.usermanager.messageHandler(username, msg.decode())
+                print('[%s] %s' % (username, msg.decode())) # type = str
 
         except Exception as e:
             print(e)
@@ -40,10 +54,9 @@ class MyTcpHandler(socketserver.BaseRequestHandler):
             self.request.send('로그인 ID : '.encode())
             username = self.request.recv(1024) # b'username'
             username = username.decode().strip() # strip() 얄옆 공백, \n 제거
-            print('-----\n', username, '\n------\n')
+            # print('-----\n', username, '\n------\n')
             if self.usermanager.addUser(username, self.request, self.client_address):
                 return username
-
 
 class ChatingServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     pass
