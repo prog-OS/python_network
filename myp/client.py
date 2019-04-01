@@ -2,7 +2,7 @@
 import socket
 from threading import Thread
 
-HOST = 'localhost'
+HOST = ''
 PORT = 9010
 
 def rcvMsg(sock, username):
@@ -11,8 +11,10 @@ def rcvMsg(sock, username):
 			data = sock.recv(1024)
 			if not data:
 				break
-			print(data.decode() + ('\n[%s] ' % username), end='')
-			# print(data.decode())
+			# print(data.decode() + ('\n[%s] ' % username), end='')
+			print(data.decode())
+			print('[rcv][%s] ' % username, end='')
+			print('', end='')
 			# print('[rcv][%s] ' % username).strip() # 위에 실행뒤 이게 안나옴...
 		except:
 			pass

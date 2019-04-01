@@ -1,5 +1,6 @@
 import socketserver
 import threading
+import os
 
 HOST = ''
 PORT = 9010
@@ -32,11 +33,8 @@ class UserManger:
         for conn, addr in self.users.values():
             # print(self.users[username][0])
             # print(conn)
-            print('111111111111111')
             if self.users[username][0] != conn: # 중복 메시지 방지
-                print('if if if if if')
                 conn.send(msg.encode())
-            print('222222222222222')
 
 class MyTcpHandler(socketserver.BaseRequestHandler):
     usermanager = UserManger()
