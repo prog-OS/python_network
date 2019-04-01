@@ -61,7 +61,7 @@ class MyTcpHandler(socketserver.BaseRequestHandler):
             self.request.send('로그인 ID : '.encode())
             print('로그인 ID 기다리는 중...')
             username = self.request.recv(1024) # b'username'
-            username = username.decode().strip() # strip() 얄옆 공백, \n 제거
+            username = username.decode().strip() # strip() 양옆 공백, \n 제거
             print('받음')
             # print('-----\n', username, '\n------\n')
             if self.usermanager.addUser(username, self.request, self.client_address):
