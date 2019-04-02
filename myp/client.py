@@ -1,22 +1,30 @@
-# -*- coding: utf-8 -*-
-
-from socket import *
-import sys
-from time import ctime
+import socket
+from threading import Thread
 
 HOST = 'localhost'
-PORT = 10000
-BUFSIZE = 1024
-ADDR = (HOST, PORT)
+PORT = 9009
 
-clientSocket = socket(AF_INET, SOCK_STREAM)
+def rcvMsg(sock):
+    while True:
+        try:
+            data = sock.recv(1024)
+            if not data:
+                break
+            print(data.decode())
+        except:
+            pass
+def runChat():
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        sock.connect((HOST, PORT))
+        t = Thread(target=rcvMsg, args=(sock,))
+        t.daemon = True
+        t.start()
 
-try:
-    clientSocket.connect(ADDR)
-    clientSocket.send('Hello!'.encode())
+        while True:
+            msg = input()
+            if msg == '/quit':
+                sock.send(msg.encode())
+                break
+            sock.send(msg.encode())
 
-except Exception as e:
-    print('%s:%s' % ADDR)
-    sys.exit()
-
-print('connect is success')
+runChat()
