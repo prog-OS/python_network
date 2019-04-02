@@ -5,26 +5,14 @@ from threading import Thread
 HOST = 'localhost'
 PORT = 9010
 
-name = False
-unPermission = False
-
 def rcvMsg(sock, username):
-	global unPermission
 
 	while True:
 		try:
 			data = sock.recv(1024)
 			if not data:
 				break
-			print(data.decode())
-			if unPermission == False and data.decode() == "permission":
-				print("unPermission = True")
-				name = True
-				unPermission = True
-			elif unPermission == False and data.decode() != "permission":
-				print('zzz')
-				continue
-			print('end if')
+
 			print(data.decode() + ('\n[%s] ' % username), end='') # 내용 출력후 자신의 아이디 출력
 
 			# print(data.decode())
@@ -36,32 +24,42 @@ def rcvMsg(sock, username):
 		except:
 			pass
 
+
 def runChat():
-	global name
-	global unPermission
 
 	with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
 		sock.connect((HOST, PORT))
-			
-		data = sock.recv(1024)
+
+		data = sock.recv(1024) # 로그인 ID :	
 		print(data.decode(), end='') # 로그인 ID : 출력
 
-		while True:
-			msg = input()
-			sock.send(msg.encode())
-			if name == True:
-				username = msg.strip()
-				thr = Thread(target=rcvMsg, args=(sock, username))
-				thr.daemon = True
-				thr.start()
+		username = input()
+		sock.send(username.encode())
+
+		while True:	
+			data = sock.recv(1024) # permission or 이미 등록
+			
+			if data.decode() != "permission":
+				print(data.decode(), end='') # 이미 등록 
+				data = sock.recv(1024) # 로그인 ID
+				print(data.decode(), end='') # 출력
 				
-			if msg == '/quit':
-				sock.send(msg.encode())
-				# thr.daemon = False
+				username = input()
+				sock.send(username.encode())
+			else:
 				break
 
-			if unPermission == True:
-				print('[%s] ' % username, end='')
+		t = Thread(target=rcvMsg, args=(sock, username))
+		t.daemon = True
+		t.start()
+
+		while True:
+			print('[%s] ' % username, end='')
+			msg = input()			
+			if msg == '/quit':
+				sock.send(msg.encode())
+				break
+			sock.send(msg.encode())
 			
 
 runChat()

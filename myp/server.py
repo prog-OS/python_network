@@ -26,7 +26,7 @@ class UserManger:
         return username
 
     def removeUser(self, username):
-        print('removerUser first : [%s]' % username)
+        print('removerUser : [%s]' % username)
         if username not in self.users:
             return
         
