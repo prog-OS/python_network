@@ -10,9 +10,9 @@ class UserManger:
     def __init__(self):
         self.users = {}
     def addUser(self, username, conn, addr):
-        # if username in self.users:
-        #     conn.send('이미 등록된 사용자 입니다.\n'.encode())
-        #     return None
+        if username in self.users:
+            conn.send('이미 등록된 사용자 입니다.\n'.encode())
+            return None
         
         lock.acquire()
         self.users[username] = (conn, addr) # key=username / values=conn, addr
@@ -22,6 +22,7 @@ class UserManger:
         #     print(key, ":", value)
         self.sendMessageToAll(username, '\n[%s]님이 입장했습니다.' % username)
         print('+++ 대화 참여자 수[%d]' % len(self.users))
+        
         return username
 
     def messageHandler(self, username, msg):

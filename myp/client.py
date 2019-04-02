@@ -2,7 +2,7 @@
 import socket
 from threading import Thread
 
-HOST = ''
+HOST = 'localhost'
 PORT = 9010
 
 def rcvMsg(sock, username):
@@ -11,11 +11,14 @@ def rcvMsg(sock, username):
 			data = sock.recv(1024)
 			if not data:
 				break
-			# print(data.decode() + ('\n[%s] ' % username), end='')
-			print(data.decode())
-			print('[rcv][%s] ' % username, end='')
-			print('', end='')
-			# print('[rcv][%s] ' % username).strip() # 위에 실행뒤 이게 안나옴...
+			print(data.decode() + ('\n[%s] ' % username), end='') # 내용 출력후 자신의 아이디 출력
+
+			# print(data.decode())
+			# print('[rcv][%s] ' % username, end='')
+			# print('', end='')
+			
+			# print(data.decode())
+			# print('[rcv][%s] ' % username, end='') # 위에 실행뒤 이게 안나옴...
 		except:
 			pass
 
@@ -26,7 +29,7 @@ def runChat():
 		sock.connect((HOST, PORT))
 			
 		data = sock.recv(1024)
-		print(data.decode(), end='') # 로그인 ID : 
+		print(data.decode(), end='') # 로그인 ID : 출력
 
 		while True:
 			msg = input()
@@ -39,7 +42,7 @@ def runChat():
 				
 			if msg == '/quit':
 				sock.send(msg.encode())
-				thr.daemon = False
+				# thr.daemon = False
 				break
 
 			print('[%s] ' % username, end='')
