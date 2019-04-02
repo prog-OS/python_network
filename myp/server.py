@@ -15,7 +15,7 @@ class UserManger:
             return None
         
         lock.acquire()
-        self.users[username] = (conn, addr) # key=username / values=conn, addr
+        self.users[username] = (conn, addr) # key=username / values=(conn, addr)
         lock.release()
 
         # for key, value in self.users.items():
@@ -26,16 +26,20 @@ class UserManger:
         return username
 
     def removeUser(self, username):
-        print('removerUser : [%s]' % username)
+        print('removeUser : [%s]' % username)
         if username not in self.users:
             return
-        
+
+        print('lock')
         lock.acquire()
         del self.users[username]
         lock.release()
+        print('release')
+        print(username)
 
-        self.sendMessageToAll('[%s]님이 퇴장했습니다.' % username)
+        self.sendMessageToAll(username, '[%s]님이 퇴장했습니다.' % username)
         print('-- 대화 참여자 수 [%d]' % len(self.users))
+        print('왜 안찍히는거야!!!!!')
 
     def messageHandler(self, username, msg):
         if msg[0] != '/':
@@ -48,8 +52,6 @@ class UserManger:
 
     def sendMessageToAll(self, username, msg):
         for conn, addr in self.users.values():
-            # print(self.users[username][0])
-            # print(conn)
             if self.users[username][0] != conn: # 중복 메시지 방지
                 conn.send(msg.encode())
 
