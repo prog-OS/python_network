@@ -56,7 +56,8 @@ def runChat():
 		while True:
 			print('[%s] ' % username, end='')
 			msg = input()			
-			if msg == '/quit':
+			if msg.find('/quit') != -1:
+				msg = '/quit'
 				sock.send(msg.encode())
 				break
 			sock.send(msg.encode())
