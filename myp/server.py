@@ -30,23 +30,25 @@ class UserManger:
         if username not in self.users:
             return
 
-        print('lock')
+        # print('lock')
         lock.acquire()
         del self.users[username]
         lock.release()
-        print('release')
-        print(username)
+        # print('release')
+        # print(username)
 
         self.rmSendMessageToAll('\n[%s]님이 퇴장했습니다.' % username)
         print('-- 대화 참여자 수 [%d]' % len(self.users))
-        print('왜 안찍히는거야!!!!!')
+        # print('왜 안찍히는거야!!!!!')
 
     def messageHandler(self, username, msg):
+        # print('messageHandler : [%s]' % msg)
         if msg[0] != '/':
             self.sendMessageToAll(username, '\n[%s] %s' % (username, msg))
             return
 
         if msg.strip() == '/quit':
+            # print('나갈때 찍혀야됨')
             self.removeUser(username)
             return -1
 
@@ -73,6 +75,7 @@ class MyTcpHandler(socketserver.BaseRequestHandler):
             while True:
                 # self.request.send(('[%s] ' % username).encode())
                 msg = self.request.recv(1024) # b'test' / type = byte
+                # print('handle : [%s]' % msg.decode())
                 # print('xxx')
                 if self.usermanager.messageHandler(username, msg.decode()) == -1:
                     self.request.close()
