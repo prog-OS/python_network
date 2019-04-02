@@ -5,12 +5,26 @@ from threading import Thread
 HOST = 'localhost'
 PORT = 9010
 
+name = False
+unPermission = False
+
 def rcvMsg(sock, username):
+	global unPermission
+
 	while True:
 		try:
 			data = sock.recv(1024)
 			if not data:
 				break
+			print(data.decode())
+			if unPermission == False and data.decode() == "permission":
+				print("unPermission = True")
+				name = True
+				unPermission = True
+			elif unPermission == False and data.decode() != "permission":
+				print('zzz')
+				continue
+			print('end if')
 			print(data.decode() + ('\n[%s] ' % username), end='') # 내용 출력후 자신의 아이디 출력
 
 			# print(data.decode())
@@ -23,7 +37,8 @@ def rcvMsg(sock, username):
 			pass
 
 def runChat():
-	name = False
+	global name
+	global unPermission
 
 	with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
 		sock.connect((HOST, PORT))
@@ -33,9 +48,9 @@ def runChat():
 
 		while True:
 			msg = input()
-			if name == False:
+			sock.send(msg.encode())
+			if name == True:
 				username = msg.strip()
-				name = True
 				thr = Thread(target=rcvMsg, args=(sock, username))
 				thr.daemon = True
 				thr.start()
@@ -45,7 +60,8 @@ def runChat():
 				# thr.daemon = False
 				break
 
-			print('[%s] ' % username, end='')
-			sock.send(msg.encode())
+			if unPermission == True:
+				print('[%s] ' % username, end='')
+			
 
 runChat()

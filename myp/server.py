@@ -25,10 +25,26 @@ class UserManger:
         
         return username
 
+    def removeUser(self, username):
+        print('removerUser first : [%s]' % username)
+        if username not in self.users:
+            return
+        
+        lock.acquire()
+        del self.users[username]
+        lock.release()
+
+        self.sendMessageToAll('[%s]님이 퇴장했습니다.' % username)
+        print('-- 대화 참여자 수 [%d]' % len(self.users))
+
     def messageHandler(self, username, msg):
         if msg[0] != '/':
             self.sendMessageToAll(username, '\n[%s] %s' % (username, msg))
             return
+
+        if msg.strip() == '/quit':
+            self.removeUser(username)
+            return -1
 
     def sendMessageToAll(self, username, msg):
         for conn, addr in self.users.values():
@@ -45,17 +61,24 @@ class MyTcpHandler(socketserver.BaseRequestHandler):
 
         try:
             username = self.registerUsername()
+            print("permission")
+            self.request.send("permission".encode())
             # msg = self.request.recv(1024)
-            # print('zzz')
             while True:
                 # self.request.send(('[%s] ' % username).encode())
                 msg = self.request.recv(1024) # b'test' / type = byte
                 # print('xxx')
-                self.usermanager.messageHandler(username, msg.decode())
+                if self.usermanager.messageHandler(username, msg.decode()) == -1:
+                    self.request.close()
+                    break
+
                 print('[%s] %s' % (username, msg.decode())) # type = str
 
         except Exception as e:
             print(e)
+
+        print('[%s] 접속종료' % self.client_address[0])
+        self.usermanager.removeUser(username)
 
     def registerUsername(self):
         while True:
