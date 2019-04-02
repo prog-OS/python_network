@@ -37,7 +37,7 @@ class UserManger:
         print('release')
         print(username)
 
-        self.sendMessageToAll(username, '[%s]님이 퇴장했습니다.' % username)
+        self.rmSendMessageToAll('\n[%s]님이 퇴장했습니다.' % username)
         print('-- 대화 참여자 수 [%d]' % len(self.users))
         print('왜 안찍히는거야!!!!!')
 
@@ -54,6 +54,10 @@ class UserManger:
         for conn, addr in self.users.values():
             if self.users[username][0] != conn: # 중복 메시지 방지
                 conn.send(msg.encode())
+
+    def rmSendMessageToAll(self, msg):
+        for conn, addr in self.users.values():
+            conn.send(msg.encode())
 
 class MyTcpHandler(socketserver.BaseRequestHandler):
     usermanager = UserManger()
