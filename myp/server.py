@@ -30,36 +30,28 @@ class UserManger:
         if username not in self.users:
             return
 
-        # print('lock')
+        self.sendMessageToAll(username, '\n[%s]님이 퇴장했습니다.' % username)
+        
         lock.acquire()
         del self.users[username]
         lock.release()
-        # print('release')
-        # print(username)
-
-        self.rmSendMessageToAll('\n[%s]님이 퇴장했습니다.' % username)
+        
         print('-- 대화 참여자 수 [%d]' % len(self.users))
-        # print('왜 안찍히는거야!!!!!')
-
+    
     def messageHandler(self, username, msg):
-        # print('messageHandler : [%s]' % msg)
-        if msg[0] != '/':
-            self.sendMessageToAll(username, '\n[%s] %s' % (username, msg))
-            return
-
         if msg.strip() == '/quit':
-            # print('나갈때 찍혀야됨')
             self.removeUser(username)
             return -1
+        
+        self.sendMessageToAll(username, '\n[%s] %s' % (username, msg))
 
     def sendMessageToAll(self, username, msg):
+        print('<<<------------- sendMessageToAll --------------')
         for conn, addr in self.users.values():
             if self.users[username][0] != conn: # 중복 메시지 방지
                 conn.send(msg.encode())
+        print('------------- sendMessageToAll -------------->>>')
 
-    def rmSendMessageToAll(self, msg):
-        for conn, addr in self.users.values():
-            conn.send(msg.encode())
 
 class MyTcpHandler(socketserver.BaseRequestHandler):
     usermanager = UserManger()
@@ -71,12 +63,10 @@ class MyTcpHandler(socketserver.BaseRequestHandler):
             username = self.registerUsername()
             print("permission")
             self.request.send("permission".encode())
-            # msg = self.request.recv(1024)
+            
             while True:
-                # self.request.send(('[%s] ' % username).encode())
                 msg = self.request.recv(1024) # b'test' / type = byte
-                # print('handle : [%s]' % msg.decode())
-                # print('xxx')
+
                 if self.usermanager.messageHandler(username, msg.decode()) == -1:
                     self.request.close()
                     break
@@ -92,16 +82,16 @@ class MyTcpHandler(socketserver.BaseRequestHandler):
     def registerUsername(self):
         while True:
             self.request.send('로그인 ID : '.encode())
-            print('로그인 ID 기다리는 중...')
             username = self.request.recv(1024) # b'username'
             username = username.decode().strip() # strip() 양옆 공백, \n 제거
-            print('받음')
-            # print('-----\n', username, '\n------\n')
+            
             if self.usermanager.addUser(username, self.request, self.client_address):
                 return username
 
+
 class ChatingServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     pass
+
 
 def runServer():
     print('+++ 채팅서버를 시작합니다.++')
