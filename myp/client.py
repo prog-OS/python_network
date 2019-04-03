@@ -56,7 +56,7 @@ def runChat():
 		while True:
 			print('[%s] ' % username, end='')
 			msg = input()			
-			if msg.find('/quit') != -1:
+			if msg.find('/quit') != -1: # 문자열 존재 X : -1 (입력중 메세지가 오면 입력했던것 + 입력한거 가 된다.)
 				msg = '/quit'
 				sock.send(msg.encode())
 				break
