@@ -30,7 +30,6 @@ class UserManger:
         if username not in self.users:
             return
 
-
         self.sendMessageToAll(username, '\n[%s]님이 퇴장했습니다.' % username)
         
         lock.acquire()
@@ -69,7 +68,12 @@ class MyTcpHandler(socketserver.BaseRequestHandler):
             
             while True:
                 msg = self.request.recv(1024) # b'test' / type = byte
+<<<<<<< HEAD
 
+=======
+                # print('handle : [%s]' % msg.decode())
+                # print('xxx')
+>>>>>>> 0442d2f0adce5c05765fbf3fdd285d77cb262125
                 if self.usermanager.messageHandler(username, msg.decode()) == -1:
                     self.request.close()
                     break
