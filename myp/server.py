@@ -30,6 +30,7 @@ class UserManger:
         if username not in self.users:
             return
 
+
         self.sendMessageToAll(username, '\n[%s]님이 퇴장했습니다.' % username)
         
         lock.acquire()
@@ -39,7 +40,9 @@ class UserManger:
         print('-- 대화 참여자 수 [%d]' % len(self.users))
     
     def messageHandler(self, username, msg):
+
         if msg.strip() == '/quit':
+            # print('나갈때 찍혀야됨')
             self.removeUser(username)
             return -1
         
