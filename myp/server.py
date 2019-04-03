@@ -68,6 +68,7 @@ class MyTcpHandler(socketserver.BaseRequestHandler):
             
             while True:
                 msg = self.request.recv(1024) # b'test' / type = byte
+
                 if self.usermanager.messageHandler(username, msg.decode()) == -1:
                     self.request.close()
                     break
