@@ -41,7 +41,6 @@ class UserManger:
     def messageHandler(self, username, msg):
 
         if msg.strip() == '/quit':
-            # print('나갈때 찍혀야됨')
             self.removeUser(username)
             return -1
         
