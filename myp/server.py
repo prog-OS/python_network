@@ -95,8 +95,8 @@ class ChatingServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
 
 
 def runServer():
-    print('+++ 채팅서버를 시작합니다.++')
-    print('+++ 끝내려면 ctrl + c')
+    print('+++ 채팅서버를 시작합니다. +++')
+    print('+++ 끝내려면 ctrl + c +++')
 
     try:
         server = ChatingServer((HOST, PORT), MyTcpHandler)
